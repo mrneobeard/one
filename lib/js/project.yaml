@@ -1,0 +1,13 @@
+git:
+  remotes:
+    js: git@github.com:mrneobeard/js
+    nb-js: git@github.com:neobeard/js
+  push:
+    subtree: true
+    remotes: [js, nb-js]
+
+  sparse:
+    - docs
+    - lib/js
+    - AGENTS.md
+    - .gitignore

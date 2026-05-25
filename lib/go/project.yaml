@@ -1,0 +1,13 @@
+git:
+  remotes:
+    go: git@github.com:mrneobeard/go
+    nb-go: git@github.com:neobeard/go
+  push:
+    subtree: true
+    remotes: [go, nb-go]
+
+  sparse:
+    - docs
+    - lib/js
+    - AGENTS.md
+    - .gitignore

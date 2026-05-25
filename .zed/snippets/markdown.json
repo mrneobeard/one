@@ -1,0 +1,11 @@
+{
+    "skill": {
+        "prefix": "skill",
+        "body": [
+          "name: $0",
+          "description: $1"
+          "---"
+        ],
+        "description": "creates a skill for md"
+    }
+}

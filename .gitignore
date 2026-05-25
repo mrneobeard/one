@@ -1,0 +1,5 @@
+.agents/state
+.artifacts
+.tmp
+**/.artifacts
+**/.tmp
