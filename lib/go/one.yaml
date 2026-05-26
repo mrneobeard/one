@@ -1,3 +1,7 @@
+name: Go Library
+alias: go
+desc: Go libraries and tooling subtree.
+
 git:
   remotes:
     go: git@github.com:mrneobeard/go

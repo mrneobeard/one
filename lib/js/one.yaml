@@ -1,3 +1,7 @@
+name: JavaScript Library
+alias: js
+desc: JavaScript libraries and tooling subtree.
+
 git:
   remotes:
     js: git@github.com:mrneobeard/js
