@@ -200,7 +200,9 @@ func (e *testEnv) execOne(t *testing.T, args ...string) {
 
 	remotesSyncProjectRef = ""
 	remotesSyncCreate = false
+	remotesSyncPublic = false
 	remotesAddCreate = false
+	remotesAddPublic = false
 	syncProjectRef = ""
 	useProjectRef = ""
 
@@ -216,7 +218,9 @@ func (e *testEnv) execOneOutput(t *testing.T, args ...string) string {
 
 	remotesSyncProjectRef = ""
 	remotesSyncCreate = false
+	remotesSyncPublic = false
 	remotesAddCreate = false
+	remotesAddPublic = false
 	syncProjectRef = ""
 	useProjectRef = ""
 

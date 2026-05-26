@@ -13,9 +13,11 @@
 - `one git remotes sync [project]` (or `-p <directory>`)
   - Adds or updates git remotes defined in the selected project's `one.yaml`.
   - With `--create`, creates missing GitHub repos via `gh` before adding remotes.
+  - Add `--public` to create those GitHub repos as public (default is private).
 - `one git remotes add <name> <url>`
   - Adds or updates a single remote.
   - With `--create`, creates missing GitHub repo via `gh` when URL points to GitHub.
+  - Add `--public` to create the GitHub repo as public (default is private).
 - `one git remotes list`
   - Lists current local git remotes and URLs.
 - `one git sync [project]` (or `-p <directory>`)

@@ -28,9 +28,9 @@ func sortedRemoteNames(remotes map[string]string) []string {
 	return names
 }
 
-func addOrUpdateRemote(name, url string, create bool) error {
+func addOrUpdateRemote(name, url string, create bool, public bool) error {
 	if create {
-		if err := ensureGithubRepoExists(url); err != nil {
+		if err := ensureGithubRepoExistsWithVisibility(url, public); err != nil {
 			return err
 		}
 	}

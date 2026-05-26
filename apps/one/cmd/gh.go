@@ -11,6 +11,10 @@ var githubSSHRemotePattern = regexp.MustCompile(`^git@github\.com:([^/]+)/([^/]+
 var githubHTTPSRemotePattern = regexp.MustCompile(`^https://github\.com/([^/]+)/([^/]+?)(\.git)?$`)
 
 func ensureGithubRepoExists(remoteURL string) error {
+	return ensureGithubRepoExistsWithVisibility(remoteURL, false)
+}
+
+func ensureGithubRepoExistsWithVisibility(remoteURL string, public bool) error {
 	owner, repo, ok := parseGithubRepo(remoteURL)
 	if !ok {
 		return nil
@@ -24,7 +28,7 @@ func ensureGithubRepoExists(remoteURL string) error {
 		return nil
 	}
 
-	if err := ghRepoCreate(owner, repo); err != nil {
+	if err := ghRepoCreate(owner, repo, public); err != nil {
 		return err
 	}
 
@@ -49,8 +53,13 @@ func ghRepoView(owner, repo string) error {
 	return err
 }
 
-func ghRepoCreate(owner, repo string) error {
-	if _, err := execOutput("gh", "repo", "create", owner+"/"+repo, "--private", "--confirm"); err != nil {
+func ghRepoCreate(owner, repo string, public bool) error {
+	visibility := "--private"
+	if public {
+		visibility = "--public"
+	}
+
+	if _, err := execOutput("gh", "repo", "create", owner+"/"+repo, visibility, "--confirm"); err != nil {
 		return fmt.Errorf("create github repo %s/%s: %w", owner, repo, err)
 	}
 

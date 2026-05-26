@@ -7,6 +7,7 @@ import (
 )
 
 var remotesAddCreate bool
+var remotesAddPublic bool
 
 var gitRemotesAddCmd = &cobra.Command{
 	Use:   "add <name> <url>",
@@ -16,7 +17,11 @@ var gitRemotesAddCmd = &cobra.Command{
 		name := args[0]
 		url := args[1]
 
-		if err := addOrUpdateRemote(name, url, remotesAddCreate); err != nil {
+		if remotesAddPublic && !remotesAddCreate {
+			return fmt.Errorf("--public requires --create")
+		}
+
+		if err := addOrUpdateRemote(name, url, remotesAddCreate, remotesAddPublic); err != nil {
 			return err
 		}
 
@@ -27,5 +32,6 @@ var gitRemotesAddCmd = &cobra.Command{
 
 func init() {
 	gitRemotesAddCmd.Flags().BoolVar(&remotesAddCreate, "create", false, "Create missing GitHub repository with gh")
+	gitRemotesAddCmd.Flags().BoolVar(&remotesAddPublic, "public", false, "Create GitHub repository as public (requires --create)")
 	gitRemotesCmd.AddCommand(gitRemotesAddCmd)
 }
