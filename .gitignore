@@ -3,3 +3,5 @@
 .tmp
 **/.artifacts
 **/.tmp
+bin/one
+.one/
