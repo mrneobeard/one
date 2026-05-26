@@ -45,10 +45,24 @@ func TestProjectsSyncAndUseAndGitCommands(t *testing.T) {
 		t.Fatalf("expected default project lib/js, got %q", idx.DefaultProject)
 	}
 
-	env.execOne(t, "git", "remotes", "js")
+	env.execOne(t, "git", "remotes", "sync", "js")
 	log := env.gitLog(t)
 	if !containsLine(log, "remote add js git@example.com:org/js") {
 		t.Fatalf("expected remote add for js, log:\n%s", strings.Join(log, "\n"))
+	}
+
+	env.execOne(t, "git", "remotes", "add", "manual", "git@example.com:org/manual")
+	log = env.gitLog(t)
+	if !containsLine(log, "remote add manual git@example.com:org/manual") {
+		t.Fatalf("expected manual remote add, log:\n%s", strings.Join(log, "\n"))
+	}
+
+	output := env.execOneOutput(t, "git", "remotes", "list")
+	if !strings.Contains(output, "js git@example.com:org/js") {
+		t.Fatalf("expected js in remote list, got: %s", output)
+	}
+	if !strings.Contains(output, "manual git@example.com:org/manual") {
+		t.Fatalf("expected manual in remote list, got: %s", output)
 	}
 
 	env.execOne(t, "git", "sync")
@@ -184,7 +198,9 @@ func (e *testEnv) writeProjectConfig(t *testing.T, relDir string, cfg testProjec
 func (e *testEnv) execOne(t *testing.T, args ...string) {
 	t.Helper()
 
-	remotesProjectRef = ""
+	remotesSyncProjectRef = ""
+	remotesSyncCreate = false
+	remotesAddCreate = false
 	syncProjectRef = ""
 	useProjectRef = ""
 
@@ -193,6 +209,31 @@ func (e *testEnv) execOne(t *testing.T, args ...string) {
 	if err != nil {
 		t.Fatalf("execute one %v: %v", args, err)
 	}
+}
+
+func (e *testEnv) execOneOutput(t *testing.T, args ...string) string {
+	t.Helper()
+
+	remotesSyncProjectRef = ""
+	remotesSyncCreate = false
+	remotesAddCreate = false
+	syncProjectRef = ""
+	useProjectRef = ""
+
+	original := rootCmd.OutOrStdout()
+	defer rootCmd.SetOut(original)
+
+	var out strings.Builder
+	rootCmd.SetOut(&out)
+	rootCmd.SetErr(&out)
+	rootCmd.SetArgs(args)
+
+	_, err := rootCmd.ExecuteC()
+	if err != nil {
+		t.Fatalf("execute one %v: %v", args, err)
+	}
+
+	return out.String()
 }
 
 func (e *testEnv) readIndex(t *testing.T) projectsIndex {
@@ -245,12 +286,12 @@ repo_root="${ONE_TEST_REPO_ROOT:?missing ONE_TEST_REPO_ROOT}"
 
 printf "%s\n" "$*" >> "$log_file"
 
-if [[ "$1" == "rev-parse" && "$2" == "--show-toplevel" ]]; then
+if [[ "$#" -ge 2 && "$1" == "rev-parse" && "$2" == "--show-toplevel" ]]; then
   printf "%s\n" "$repo_root"
   exit 0
 fi
 
-if [[ "$1" == "remote" && "$2" == "get-url" ]]; then
+if [[ "$#" -ge 2 && "$1" == "remote" && "$2" == "get-url" ]]; then
   name="$3"
   f="$repo_root/.git-remote-$name"
   if [[ -f "$f" ]]; then
@@ -261,25 +302,33 @@ if [[ "$1" == "remote" && "$2" == "get-url" ]]; then
   exit 2
 fi
 
-if [[ "$1" == "remote" && "$2" == "add" ]]; then
+if [[ "$1" == "remote" && "$#" -eq 1 ]]; then
+  for f in "$repo_root"/.git-remote-*; do
+    [[ -e "$f" ]] || continue
+    printf "%s\n" "${f##*/.git-remote-}"
+  done
+  exit 0
+fi
+
+if [[ "$#" -ge 2 && "$1" == "remote" && "$2" == "add" ]]; then
   name="$3"
   url="$4"
   printf "%s\n" "$url" > "$repo_root/.git-remote-$name"
   exit 0
 fi
 
-if [[ "$1" == "remote" && "$2" == "set-url" ]]; then
+if [[ "$#" -ge 2 && "$1" == "remote" && "$2" == "set-url" ]]; then
   name="$3"
   url="$4"
   printf "%s\n" "$url" > "$repo_root/.git-remote-$name"
   exit 0
 fi
 
-if [[ "$1" == "push" && "$2" == "origin" ]]; then
+if [[ "$#" -ge 2 && "$1" == "push" && "$2" == "origin" ]]; then
   exit 0
 fi
 
-if [[ "$1" == "subtree" && "$2" == "push" ]]; then
+if [[ "$#" -ge 2 && "$1" == "subtree" && "$2" == "push" ]]; then
   exit 0
 fi
 

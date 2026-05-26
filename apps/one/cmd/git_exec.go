@@ -37,3 +37,21 @@ func gitOutput(args ...string) (string, error) {
 
 	return strings.TrimSpace(stdout.String()), nil
 }
+
+func execOutput(name string, args ...string) (string, error) {
+	command := exec.Command(name, args...)
+	var stdout bytes.Buffer
+	var stderr bytes.Buffer
+	command.Stdout = &stdout
+	command.Stderr = &stderr
+
+	if err := command.Run(); err != nil {
+		msg := strings.TrimSpace(stderr.String())
+		if msg == "" {
+			msg = err.Error()
+		}
+		return "", fmt.Errorf("%s %s: %s", name, strings.Join(args, " "), msg)
+	}
+
+	return strings.TrimSpace(stdout.String()), nil
+}
