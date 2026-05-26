@@ -1,0 +1,14 @@
+[tools]
+go = "latest"
+
+[tasks.build]
+run = "go build -o ../../bin/one ."
+
+[tasks.test]
+run = "go test ./..."
+
+[tasks.lint]
+run = "go vet ./..."
+
+[tasks.vuln]
+run = "go run golang.org/x/vuln/cmd/govulncheck@latest ./..."
